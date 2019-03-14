@@ -15,56 +15,61 @@ import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 
-public class Hooks{
+public class Hooks {
     private static final Logger LOG = Logger.getLogger(Hooks.class.getName());
     public static WebDriver driver;
-    
+
     @Before
     /**
      * Delete all cookies at the start of each scenario to avoid
      * shared state between tests
      */
     public void openBrowser() throws MalformedURLException {
-    	LOG.info("Launching Chrome.");
-    	setChromeDriverEnvironmentProperties();
-    	
-    	driver = new ChromeDriver();
-    	driver.manage().deleteAllCookies();
-    	driver.manage().window().maximize();
+        LOG.info("Launching Chrome.");
+        setChromeDriverEnvironmentProperties();
+
+        driver = new ChromeDriver();
+        driver.manage().deleteAllCookies();
+        driver.manage().window().maximize();
     }
-    
-   
+
+
     @After
     /**
      * Embed a screenshot in test report if test is marked as failed
      */
     public void embedScreenshot(Scenario scenario) {
-       
-        if(scenario.isFailed()) {
-        try {
-        	 scenario.write("Current Page URL is " + driver.getCurrentUrl());
-            byte[] screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.BYTES);
-            scenario.embed(screenshot, "image/png");
-        } catch (WebDriverException somePlatformsDontSupportScreenshots) {
-            System.err.println(somePlatformsDontSupportScreenshots.getMessage());
+
+        if (scenario.isFailed()) {
+            try {
+                scenario.write("Current Page URL is " + driver.getCurrentUrl());
+                byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+                scenario.embed(screenshot, "image/png");
+            } catch (WebDriverException somePlatformsDontSupportScreenshots) {
+                System.err.println(somePlatformsDontSupportScreenshots.getMessage());
+            }
+
         }
-        
-        }
-        
+
         closeBrowser();
     }
 
-	private void closeBrowser() {
-		driver.quit();
+    /**
+     * Method to Close the browser
+     */
+    private void closeBrowser() {
+        driver.quit();
         LOG.info("Chrome Closed.");
-	}
-    
-    private void setChromeDriverEnvironmentProperties()
-    {
-    	ClassLoader classLoader = getClass().getClassLoader();
-    	File file = new File(classLoader.getResource("chromedriver.exe").getFile());
-    	
-    	System.setProperty("webdriver.chrome.driver", file.getPath());
     }
-    
+
+    /**
+     * Method to configure chrome driver properties
+     */
+    private void setChromeDriverEnvironmentProperties() {
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("chromedriver.exe").getFile());
+
+        System.setProperty("webdriver.chrome.driver", file.getPath());
+    }
+
 }
